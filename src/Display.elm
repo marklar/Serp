@@ -8,7 +8,8 @@ import Config
 import Model
     (Snake, Pos, Input, State)
 
-----
+
+-- Display
 
 display : State -> Element
 display state =

@@ -89,7 +89,7 @@ getAppleState state newApplePos =
       Nothing -> Just newApplePos
       Just applePos ->
           if isEating state.snake applePos
-            then Nothing
+            then Just newApplePos
             else Just applePos
 
 isEating : Snake -> Pos -> Bool
@@ -100,5 +100,5 @@ distance : Pos -> Pos -> Float
 distance (ax,ay) (bx,by) =
     sqrt <| (ax - bx) ^ 2 + (ay - by) ^ 2
           
-maxDistance = (appleRadius + snakeWidth) / 2
+maxDistance = (appleRadius + snakeWidth) / 3
 

@@ -1,4 +1,4 @@
-module Inputs (stateSignal, appleSignal) where
+module Inputs (stateSignal, newAppleSignal) where
 
 import Keyboard
 import Random
@@ -9,7 +9,7 @@ import Model (Pos, Input, State, Light, Red, LightInput, initState)
 
 -- State
 
--- TODO: Move `stateSignal` int Main?
+-- TODO: Move `stateSignal` into Main?
 -- We'll want to move the apple into the State.
 stateSignal : Signal State
 stateSignal = foldp updateState initState inputSignal
@@ -17,7 +17,7 @@ stateSignal = foldp updateState initState inputSignal
 inputSignal : Signal Input
 inputSignal = Input <~ (dropRepeats lightSignal)
                      ~ (dropRepeats Keyboard.arrows)
-                     ~ appleSignal
+                     ~ newAppleSignal
                      ~ elapsedSignal
 
 elapsedSignal : Signal Time
@@ -29,16 +29,33 @@ isGreen light = light /= Red
 
 -- Apple
 
+{-
+
+Currently, newAppleSignal is computing Random numbers every 'interval' (1
+second).  But those numbers are being used only when the snake eats the
+apple, which will be much less frequently.
+
+Maybe this is no big deal.  Or maybe it's an important inefficiency?
+
+If it does matter, then how can we modify newAppleSignal to 'fire' only
+when needed (i.e. when state.apple goes to Nothing)?
+
+Random.range produces a new event only when the input signal
+*changes*.  We would need a signal which reports when state.apple goes
+to Nothing, using `sampleOn`.
+
+-}
+
 -- Updates all the time, even though usually goes unused.
-appleSignal : Signal Pos
-appleSignal = 
+newAppleSignal : Signal Pos
+newAppleSignal = 
     let f a b = (toFloat a, toFloat b)
-    in lift2 f (Random.range minX maxX intervalSignal)
-               (Random.range minY maxY intervalSignal)
+    in lift2 f
+           (Random.range minX maxX intervalSignal)
+           (Random.range minY maxY intervalSignal)
 
 intervalSignal : Signal Time
 intervalSignal = every second
--- intervalSignal = every (1000 * millisecond)
 
 (minX, maxX) = boundCoords collWd
 (minY, maxY) = boundCoords collHt

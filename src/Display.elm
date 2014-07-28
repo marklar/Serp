@@ -50,6 +50,3 @@ appleForm = filled appleColor (circle appleRadius)
 
 nothingForm : Form
 nothingForm = alpha 0.0 (filled bgColor (circle 0))
-
---  (croppedImage (40,100) 40 80 "trev.png")
---  (croppedImage (80,60) 130 150 "zoe.png")

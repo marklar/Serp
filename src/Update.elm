@@ -18,7 +18,6 @@ updateLightInput newSpace {space,light} =
 
 -- SNAKE
 
-
 updateState : Input -> State -> State
 updateState {light,arrowDir,applePos,elapsed} state =
     if state.light == Green

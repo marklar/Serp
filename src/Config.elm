@@ -1,15 +1,15 @@
 module Config where
 
 -- Garden
-collWd = 1400
-collHt = 750
+collWd = 700 -- 1400
+collHt = 375 -- 750
 bgColor = white
 
 -- Apple
-appleRadius = 10
+appleRadius = 15
 appleColor = red
 
 -- Snake
-snakeWidth = 15
+snakeWidth = 30
 snakeColor = rgb 40 140 80
-snakeSpeed = 250.0
+snakeSpeed = 300.0

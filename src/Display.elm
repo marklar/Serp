@@ -15,10 +15,17 @@ display : State -> Element
 display state =
     flow down [ asText state.light
               , asText state.apple
-              , collage collWd collHt [ showApple state.apple
-                                      , showSnake state.snake
-                                      ]
+              , showCollage state
               ]
+
+showCollage : State -> Element
+showCollage state =
+    container (collWd + 20) (collHt + 20) middle
+                  (color grey
+                   (collage collWd collHt [ showApple state.apple
+                                          , showSnake state.snake
+                                          ]))
+
 
 -- Snake
 

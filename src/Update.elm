@@ -23,13 +23,23 @@ updateState {light,arrowDir,applePos,elapsed} state =
     if state.light == Green
       then
           let newHeadPos = getSnakePos elapsed state
+              didEat = isEating state.snake state.apple
+              snakeFn = if didEat then pushSnake else moveSnake
           in { snakeDir = getSnakeDir arrowDir state.snakeDir
-             , snake = moveSnake newHeadPos state.snake
-             -- , snake = pushSnake newHeadPos state.snake
+             , snake = snakeFn newHeadPos state.snake
              , light = light
-             , apple = getAppleState state applePos
+             , apple = case (didEat, state.apple) of
+                         (True, _) -> Nothing -- Just applePos
+                         (_, Nothing) -> Just applePos
+                         (_, _) -> state.apple
              }
       else { state | light <- light }
+
+isEating : Snake -> Maybe Pos -> Bool
+isEating snake apple =
+    case apple of
+      Nothing -> False
+      Just pos -> maxDistance > (distance snake.hd pos)
 
 ----
 
@@ -82,22 +92,9 @@ travelDistance elapsed dirVal =
 
 -- Apple
 
-getAppleState : State -> Pos -> Maybe Pos
-getAppleState state newApplePos =
-    case state.apple of
-      Nothing -> Just newApplePos
-      Just applePos ->
-          if isEating state.snake applePos
-            then Just newApplePos
-            else Just applePos
-
-isEating : Snake -> Pos -> Bool
-isEating snake applePos =
-    maxDistance > (distance snake.hd applePos)
-
 distance : Pos -> Pos -> Float
 distance (ax,ay) (bx,by) =
     sqrt <| (ax - bx) ^ 2 + (ay - by) ^ 2
           
-maxDistance = (appleRadius + snakeWidth) / 3
+maxDistance = (appleRadius + snakeWidth) / 2
 

@@ -1,5 +1,6 @@
 module Update (updateState, updateLightInput) where
 
+import Config (appleRadius, snakeWidth, snakeSpeed)
 import Model (Input, LightInput, State, Snake, Pos, Dir, Green, Red)
 
 
@@ -17,8 +18,9 @@ updateLightInput newSpace {space,light} =
 
 -- SNAKE
 
+
 updateState : Input -> State -> State
-updateState {light,arrowDir,elapsed} state =
+updateState {light,arrowDir,applePos,elapsed} state =
     if state.light == Green
       then
           let newHeadPos = getSnakePos elapsed state
@@ -26,6 +28,7 @@ updateState {light,arrowDir,elapsed} state =
              , snake = moveSnake newHeadPos state.snake
              -- , snake = pushSnake newHeadPos state.snake
              , light = light
+             , apple = getAppleState state applePos
              }
       else { state | light <- light }
 
@@ -68,15 +71,34 @@ getSnakeDir arrowDir snakeDir =
       (0,y) -> { x = 0, y = turn y snakeDir.y }
       (x,_) -> { y = 0, x = turn x snakeDir.x }
 
-snakeSpeed = 250.0
-
-distance : Time -> Int -> Float
-distance elapsed dirVal =
-    snakeSpeed * elapsed * (toFloat dirVal)
-
 getSnakePos : Time -> State -> Pos
 getSnakePos elapsed {snake,snakeDir} =
     let (x,y) = snake.hd
-    in  (x + (distance elapsed snakeDir.x),
-         y + (distance elapsed snakeDir.y))
+    in  (x + (travelDistance elapsed snakeDir.x),
+         y + (travelDistance elapsed snakeDir.y))
+
+travelDistance : Time -> Int -> Float
+travelDistance elapsed dirVal =
+    snakeSpeed * elapsed * (toFloat dirVal)
+
+-- Apple
+
+getAppleState : State -> Pos -> Maybe Pos
+getAppleState state newApplePos =
+    case state.apple of
+      Nothing -> Just newApplePos
+      Just applePos ->
+          if isEating state.snake applePos
+            then Nothing
+            else Just applePos
+
+isEating : Snake -> Pos -> Bool
+isEating snake applePos =
+    maxDistance > (distance snake.hd applePos)
+
+distance : Pos -> Pos -> Float
+distance (ax,ay) (bx,by) =
+    sqrt <| (ax - bx) ^ 2 + (ay - by) ^ 2
+          
+maxDistance = (appleRadius + snakeWidth) / 2
 

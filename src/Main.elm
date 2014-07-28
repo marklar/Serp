@@ -1,7 +1,7 @@
 module Main where
 
 import Display (display)
-import Inputs (stateSignal, inputSignal, appleSignal)
+import Inputs (stateSignal)
 
 main : Signal Element
-main = display <~ stateSignal ~ inputSignal ~ appleSignal
+main = display <~ stateSignal

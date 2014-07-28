@@ -1,35 +1,54 @@
 module Display (display) where
 
-import Model (Snake, Pos, Input, State, collWd, collHt)
+import Config
+    (collWd, collHt, bgColor,
+     appleColor, appleRadius,
+     snakeColor, snakeWidth)
 
-snakeGreen : Color
-snakeGreen = rgb 40 140 80
+import Model
+    (Snake, Pos, Input, State)
 
 ----
 
-display : State -> Input -> Pos -> Element
-display ({snake} as state) input apple =
-    flow down [ asText input
-              , asText apple
-              , collage collWd collHt [ showSnake snake
-                                      , showApple apple
+display : State -> Element
+display state =
+    flow down [ asText state.light
+              , asText state.apple
+              , collage collWd collHt [ showApple state.apple
+                                      , showSnake state.snake
                                       ]
               ]
 
-----
+-- Snake
 
 showSnake : Snake -> Form
-showSnake {hd,front,back,tl} =
-    traced { defaultLine | color <- snakeGreen
-                           , width <- 15
-                           , cap   <- Round
-                           , join  <- Smooth
-                           }
-             (path (hd :: front ++ (reverse back) ++ [tl]))
+showSnake snake =
+    traced snakeLineStyle (snakePath snake)
 
-showApple : Pos -> Form
+snakePath : Snake -> Path
+snakePath {hd,front,back,tl} =
+    (path (hd :: front ++ (reverse back) ++ [tl]))
+
+snakeLineStyle : LineStyle
+snakeLineStyle = { defaultLine | color <- snakeColor
+                               , width <- snakeWidth
+                               , cap   <- Round
+                               , join  <- Smooth
+                               }
+
+-- Apple
+
+showApple : Maybe Pos -> Form
 showApple applePos =
-    move applePos (filled red (circle 10))
+    case applePos of
+      Nothing -> nothingForm
+      Just p  -> move p appleForm
+
+appleForm : Form
+appleForm = filled appleColor (circle appleRadius)
+
+nothingForm : Form
+nothingForm = alpha 0.0 (filled bgColor (circle 0))
 
 --  (croppedImage (40,100) 40 80 "trev.png")
 --  (croppedImage (80,60) 130 150 "zoe.png")

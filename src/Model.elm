@@ -2,18 +2,17 @@ module Model where
 
 import Array
 
-collWd : Int
-collWd = 1400
-collHt : Int
-collHt = 750
+----
 
 type Pos = (Float,Float)
 type Dir = {x:Int, y:Int}
 data Light = Green | Red
 
+-- What to do *next*.
 type Input = { light : Light
-             , arrowDir : Dir  -- How to move *next*.
-             , elapsed : Time  -- How long since last updated?
+             , arrowDir : Dir
+             , applePos : Pos
+             , elapsed : Time
              }
 
 type LightInput = { space : Bool
@@ -29,6 +28,7 @@ type Snake = { hd : Pos
 type State = { snakeDir : Dir
              , snake : Snake
              , light : Light
+             , apple : Maybe Pos
              }
 
 {-
@@ -71,4 +71,5 @@ initState : State
 initState = { snakeDir = {x=0, y=1}
             , snake = initSnake 20
             , light = Red
+            , apple = Nothing
             }
